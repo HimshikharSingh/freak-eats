@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { deepOrange} from '@mui/material/colors';
+
 
 
 import { useCart } from './ContextReducer';
@@ -10,7 +10,7 @@ import { Badge } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 export default function Navbar(props) {
-  const primary = deepOrange[900];
+
   const [cartView, setCartView] = useState(false)
   localStorage.setItem('temp', "first")
   const navigate = useNavigate();
