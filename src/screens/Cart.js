@@ -16,7 +16,7 @@ export default function Cart() {
     let userEmail = localStorage.getItem("userEmail");
     // console.log(data,localStorage.getItem("userEmail"),new Date())
     let response = await fetch(
-      "https://freak-eats-backends.onrender.com/api/orderData",
+      "/api/orderData",
       {
         method: "POST",
         headers: {

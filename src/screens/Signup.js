@@ -11,7 +11,7 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const response = await fetch(
-      "https://freak-eats-backends.onrender.com/api/createuser",
+      "/api/createuser",
       {
         method: "POST",
         headers: {

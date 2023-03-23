@@ -10,7 +10,7 @@ export default function Home() {
   const [foodItem, setFoodItem] = useState([]);
 
   const loadData = async () => {
-    let response = await fetch("https://freak-eats-backends.onrender.com/api/foodData", {
+    let response = await fetch("/api/foodData", {
       method: "POST",
       headers: {
         'Content-Type': 'application/json'
