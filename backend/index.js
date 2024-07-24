@@ -6,7 +6,7 @@ const mongoDB = require("./db");
 mongoDB();
 
 // Set up CORS to allow requests only from the Netlify deployment
-const allowedOrigin = "https://freakeats.netlify.app/";
+const allowedOrigin = "https://master--freakeats.netlify.app";
 
 app.use(
   cors({
