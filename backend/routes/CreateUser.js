@@ -14,7 +14,6 @@ router.post(
     body("name", "Invalid name entry").isLength({ min: 5 }),
     body("password", "Invalid password entry").isLength({ min: 5 }),
   ],
-
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -33,13 +32,12 @@ router.post(
       });
       res.json({ success: true });
     } catch (error) {
-      console.log(error);
-      res.json({ success: false });
+      console.error(error);
+      res.status(500).json({ success: false, error: "Server Error" });
     }
   }
 );
 
-//for registered user
 router.post(
   "/loginuser",
   [
@@ -76,10 +74,10 @@ router.post(
         },
       };
       const authToken = jwt.sign(data, jwtSecret);
-      return res.json({ success: true, authToken: authToken });
+      return res.json({ success: true, authToken });
     } catch (error) {
-      console.log(error);
-      res.json({ success: false });
+      console.error(error);
+      res.status(500).json({ success: false, error: "Server Error" });
     }
   }
 );

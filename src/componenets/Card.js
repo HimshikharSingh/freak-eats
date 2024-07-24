@@ -11,6 +11,7 @@ export default function Card(props) {
   let priceOptions = Object.keys(options);
   const [qty, setQty] = useState(1);
   const [size, setSize] = useState("");
+
   const handleClick = () => {
     if (!localStorage.getItem("authToken")) {
       navigate("/login");
@@ -18,17 +19,9 @@ export default function Card(props) {
   };
 
   const handleAddToCart = async () => {
-    let food = [];
-    for (const item of data) {
-      if (item.id === props.foodItem._id) {
-        food = item;
-
-        break;
-      }
-    }
-    console.log(food);
-    console.log(new Date());
-    if (food !== []) {
+    let food = data.find(item => item.id === props.foodItem._id) || [];
+    
+    if (food.length !== 0) {
       if (food.size === size) {
         await dispatch({
           type: "UPDATE",
@@ -55,19 +48,24 @@ export default function Card(props) {
 
     await dispatch({
       type: "ADD",
-      id: props.foodItem_id,
+      id: props.foodItem._id,
       name: props.foodItem.name,
       qty: qty,
       price: finalPrice,
       size: size,
       img: props.foodItem.img,
     });
-    await console.log(data);
+    console.log(data);
   };
-  let finalPrice = qty * parseInt(options[size]);
+
+  let finalPrice = qty * (options[size] ? parseInt(options[size]) : 0);
+
   useEffect(() => {
-    setSize(priceRef.current.value);
+    if (priceRef.current) {
+      setSize(priceRef.current.value);
+    }
   }, []);
+
   return (
     <div>
       <div>
@@ -78,45 +76,40 @@ export default function Card(props) {
           <img
             src={props.foodItem.img}
             className="card-img-top"
-            alt="..."
+            alt={props.foodItem.name}
             style={{ height: "150px", objectFit: "fill" }}
           />
           <div className="card-body">
             <h5 className="card-title">{props.foodItem.name}</h5>
             <div className="container w-100">
               <select
-                className="m-2 h-100 bg warning rounded"
+                className="m-2 h-100 bg-warning rounded"
                 onChange={(e) => setQty(e.target.value)}
                 onClick={handleClick}
               >
-                {Array.from(Array(6), (e, i) => {
-                  return (
-                    <option key={i + 1} value={i + 1}>
-                      {" "}
-                      {i + 1}
-                    </option>
-                  );
-                })}
+                {Array.from(Array(6), (e, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1}
+                  </option>
+                ))}
               </select>
               <select
-                className="m-2 h-100 bg warning rounded"
+                className="m-2 h-100 bg-warning rounded"
                 ref={priceRef}
                 onChange={(e) => setSize(e.target.value)}
                 onClick={handleClick}
               >
-                {priceOptions.map((data) => {
-                  return (
-                    <option key={data} value={data}>
-                      {data}
-                    </option>
-                  );
-                })}
+                {priceOptions.map((data) => (
+                  <option key={data} value={data}>
+                    {data}
+                  </option>
+                ))}
               </select>
               <div className="d-inline h-100 fs-4">₹{finalPrice}/-</div>
             </div>
-            <hr></hr>
+            <hr />
             <button
-              className={`btn btn-warning justify-center ms-2`}
+              className="btn btn-warning justify-center ms-2"
               onClick={handleAddToCart}
             >
               Add To Cart
