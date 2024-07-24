@@ -5,16 +5,13 @@ const port = 5000;
 const mongoDB = require("./db");
 mongoDB();
 
-// Set up CORS to allow requests from multiple origins
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://master--gentle-muffin-8740bb.netlify.app"
-];
+// Set up CORS to allow requests only from the Netlify deployment
+const allowedOrigin = "https://freakeats.netlify.app/";
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || origin === allowedOrigin) {
         // Allow requests with no origin (like mobile apps or Postman)
         callback(null, true);
       } else {
