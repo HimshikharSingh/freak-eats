@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import Navbar from '../componenets/Navbar'
-import Footer from '../componenets/Footer'
-import Card from '../componenets/Card'
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
+import Card from '../components/Card'
 import Burger from "./freshest-burgers-in-brooklyn.webp"
 import Pastry from "./pastry.jpg"
 import Barbeque from "./barbeque.jpg"
-import ErrorComponent from '../componenets/ErrorComponent';
+import ErrorComponent from '../components/ErrorComponent'
 
 
 export default function Home() {

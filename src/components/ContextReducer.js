@@ -18,35 +18,25 @@ const reducer = (state, action) => {
         },
       ];
     case "REMOVE":
-      let newArr = [...state];
-      newArr.splice(action.index, 1);
-      return newArr;
+      return state.filter((_, index) => index !== action.index);
     case "DROP":
-      let empArray = [];
-      return empArray;
+      return []; // Clear the cart
     case "UPDATE":
-      let arr = [...state];
-      arr.find((food, index) => {
-        if (food.id === action.id) {
-          console.log(
-            food.qty,
-            parseInt(action.qty),
-            action.price + food.price
-          );
-          arr[index] = {
-            ...food,
-            qty: parseInt(action.qty) + food.qty,
-            price: action.price + food.price,
-          };
-        }
-        return arr;
-      });
-      return arr;
-
+      return state.map((food) =>
+        food.id === action.id
+          ? {
+              ...food,
+              qty: parseInt(action.qty) + food.qty,
+              price: action.price + food.price,
+            }
+          : food
+      );
     default:
-      console.log("Error In Reducer");
+      console.error("Unhandled action type:", action.type);
+      return state;
   }
 };
+
 export const CartProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, []);
   return (
@@ -58,5 +48,18 @@ export const CartProvider = ({ children }) => {
   );
 };
 
-export const useCart = () => useContext(CartStateContext);
-export const useDispatchCart = () => useContext(CartDispatchContext);
+export const useCart = () => {
+  const context = useContext(CartStateContext);
+  if (context === undefined) {
+    throw new Error("useCart must be used within a CartProvider");
+  }
+  return context;
+};
+
+export const useDispatchCart = () => {
+  const context = useContext(CartDispatchContext);
+  if (context === undefined) {
+    throw new Error("useDispatchCart must be used within a CartProvider");
+  }
+  return context;
+};

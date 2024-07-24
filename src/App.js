@@ -6,7 +6,7 @@ import "../node_modules/bootstrap-dark-5/dist/css/bootstrap-dark.min.css";
 import "../node_modules/bootstrap/dist/js/bootstrap.bundle";
 import "../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js";
 import Signup from "./screens/Signup";
-import { CartProvider } from "./componenets/ContextReducer";
+import { CartProvider } from "./components/ContextReducer";
 import MyOrder from "./screens/MyOrders";
 
 function App() {

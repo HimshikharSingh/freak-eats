@@ -1,23 +1,22 @@
 import React from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useCart, useDispatchCart } from "../componenets/ContextReducer";
+import { useCart, useDispatchCart } from "../components/ContextReducer"; // Fixed the import path
+
 export default function Cart() {
-  let data = useCart();
-  let dispatch = useDispatchCart();
+  const data = useCart();
+  const dispatch = useDispatchCart();
+
   if (data.length === 0) {
     return (
-      <div>
-        <div className="m-5 w-100 text-center fs-3">The Cart is Empty!</div>
-      </div>
+      <div className="m-5 w-100 text-center fs-3">The Cart is Empty!</div>
     );
   }
 
   const handleCheckOut = async () => {
-    let userEmail = localStorage.getItem("userEmail");
-    // console.log(data,localStorage.getItem("userEmail"),new Date())
-    let response = await fetch(
-      "/api/orderData",
-      {
+    try {
+      const userEmail = localStorage.getItem("userEmail");
+
+      const response = await fetch("/api/orderData", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -27,18 +26,23 @@ export default function Cart() {
           email: userEmail,
           order_date: new Date().toDateString(),
         }),
-      }
-    );
+      });
 
-    if (response.status === 200) {
-      dispatch({ type: "DROP" });
+      if (response.ok) {
+        dispatch({ type: "DROP" });
+      } else {
+        console.error("Failed to check out:", response.statusText);
+      }
+    } catch (error) {
+      console.error("An error occurred during checkout:", error);
     }
   };
 
-  let totalPrice = data.reduce((total, food) => total + food.price, 0);
+  const totalPrice = data.reduce((total, food) => total + food.price, 0);
+
   return (
     <div>
-      <div className="container m-auto mt-5 table-responsive table-responsive-sm table-responsive-md">
+      <div className="container m-auto mt-5 table-responsive">
         <table className="table table-hover">
           <thead className="text-warning fs-4">
             <tr>
@@ -52,32 +56,27 @@ export default function Cart() {
           </thead>
           <tbody>
             {data.map((food, index) => (
-              <tr>
+              <tr key={index}>
                 <th scope="row">{index + 1}</th>
                 <td>{food.name}</td>
                 <td>{food.qty}</td>
                 <td>{food.size}</td>
-                <td>{food.price}</td>
+                <td>₹{food.price}</td>
                 <td>
-                  <button type="button" className="btn p-0">
-                    <DeleteIcon
-                      onClick={() => {
-                        dispatch({ type: "REMOVE", index: index });
-                      }}
-                    />
-                  </button>{" "}
+                  <button type="button" className="btn p-0" onClick={() => dispatch({ type: "REMOVE", index })}>
+                    <DeleteIcon />
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
         <div>
-          <h1 className="fs-2">Total Price: {totalPrice}/-</h1>
+          <h1 className="fs-2">Total Price: ₹{totalPrice}/-</h1>
         </div>
         <div>
-          <button className="btn bg-warning mt-5 " onClick={handleCheckOut}>
-            {" "}
-            Check Out{" "}
+          <button className="btn bg-warning mt-5" onClick={handleCheckOut}>
+            Check Out
           </button>
         </div>
       </div>

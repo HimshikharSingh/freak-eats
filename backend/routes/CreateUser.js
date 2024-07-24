@@ -6,13 +6,12 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const jwtSecret = "W4Bo7ISI5zPUGYx0qmEDvd1yCjsoXneQ";
 //for a new user
-
 router.post(
   "/createuser",
   [
     body("email", "Invalid email entry").isEmail(),
-    body("name", "Invalid name entry").isLength({ min: 5 }),
-    body("password", "Invalid password entry").isLength({ min: 5 }),
+    body("name", "Name must be at least 5 characters long").isLength({ min: 5 }),
+    body("password", "Password must be at least 5 characters long").isLength({ min: 5 }),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -20,16 +19,25 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    let secPassword = await bcrypt.hash(req.body.password, salt);
+    const { name, email, password, location } = req.body;
 
     try {
-      await User.create({
-        name: req.body.name,
-        password: secPassword,
-        email: req.body.email,
-        location: req.body.location,
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ errors: [{ msg: "User already exists" }] });
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      const newUser = new User({
+        name,
+        email,
+        password: hashedPassword,
+        location,
       });
+
+      await newUser.save();
       res.json({ success: true });
     } catch (error) {
       console.error(error);
@@ -38,6 +46,7 @@ router.post(
   }
 );
 
+//for existing user
 router.post(
   "/loginuser",
   [
@@ -81,5 +90,34 @@ router.post(
     }
   }
 );
+
+//for fetching user name currently logged in
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token == null) return res.sendStatus(401);
+
+  jwt.verify(token, jwtSecret, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+};
+
+// Get logged-in user details
+router.get('/me', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server Error' });
+  }
+});
+
 
 module.exports = router;

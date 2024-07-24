@@ -1,37 +1,51 @@
 import React, { useState } from "react";
-import Navbar from "../componenets/Navbar";
+import Navbar from "../components/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
-  const [credentials, setcredentials] = useState({ email: "", password: "" });
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const [errorMessage, setErrorMessage] = useState(""); // State for error messages
   let navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch("/api/loginuser", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: credentials.email,
-        password: credentials.password,
-      }),
-    });
-    const json = await response.json();
-    console.log(json);
-    if (!json.success) {
-      alert("Enter Valid Credentials!");
-    }
-    if (json.success) {
-      localStorage.setItem("userEmail", credentials.email);
-      localStorage.setItem("authToken", json.authToken);
-      console.log(localStorage.getItem("authToken"));
-      navigate("/");
+
+    try {
+      const response = await fetch("/api/loginuser", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password,
+        }),
+      });
+
+      const json = await response.json();
+
+      if (response.ok) { // Check if the response status is OK (200)
+        if (json.success) {
+          localStorage.setItem("userEmail", credentials.email);
+          localStorage.setItem("authToken", json.authToken);
+          console.log(localStorage.getItem("authToken"));
+          navigate("/"); // Redirect to homepage or desired route
+        } else {
+          setErrorMessage("Invalid credentials, please try again.");
+        }
+      } else {
+        setErrorMessage("Failed to login, please try again later.");
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      setErrorMessage("An error occurred, please try again later.");
     }
   };
+
   const onChange = (e) => {
-    setcredentials({ ...credentials, [e.target.name]: e.target.value });
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
+
   return (
     <>
       <div
@@ -83,6 +97,11 @@ function Login() {
             <Link to="/signup" className="m-3 btn btn-danger">
               Not a Registered User?
             </Link>
+            {errorMessage && ( // Show error message if there is any
+              <div className="m-3 alert alert-danger">
+                {errorMessage}
+              </div>
+            )}
           </form>
         </div>
       </div>
